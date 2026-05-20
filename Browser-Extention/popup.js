@@ -100,11 +100,15 @@ const translations = {
     "error-unknown-init": "שגיאה לא ידועה באתחול המאגרים",
     "nav-info": "מידע",
     "info-app-name": "עורך אימייל",
-    "info-version": "גרסה 1.0.0",
+    "info-version": "גרסא 1.0.0",
     "info-forum-title": "פורום מתמחים טופ",
     "info-forum-desc": "נושא ראשי לתוסף במתמחים טופ",
-    "info-github-title": "פרויקט GitHub",
-    "info-github-desc": "קוד מקור ודיווח על באגים"
+    "info-github-title": "פרוייקט GitHub",
+    "info-github-desc": "קוד מקור ודיווח על באגים",
+    "update-available": "עדכון זמין!",
+    "update-desc": "גרסה {latest} זמינה — אצלך מותקנת {current}",
+    "update-btn": "הורד",
+    "update-dismiss": "אחר כך"
   },
   en: {
     "app-title": "Email Editor",
@@ -196,7 +200,11 @@ const translations = {
     "info-forum-title": "Mitmachim Top Forum",
     "info-forum-desc": "Main thread for the extension on Mitmachim Top",
     "info-github-title": "GitHub Project",
-    "info-github-desc": "Source code and bug reporting"
+    "info-github-desc": "Source code and bug reporting",
+    "update-available": "Update Available!",
+    "update-desc": "v{latest} is ready — you have v{current}",
+    "update-btn": "Download",
+    "update-dismiss": "Later"
   }
 };
 
@@ -205,6 +213,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   setupSettingsHandlers();
   setupThemeToggle();
   setupLanguage();
+  setupUpdateCheck();
 
   // Listen for background updates
   chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
@@ -282,6 +291,60 @@ function setupThemeToggle() {
     setTheme(newTheme);
     chrome.storage.local.set({ appTheme: newTheme });
   });
+}
+
+// ─── Update Check ─────────────────────────────────────────────────────────
+
+function setupUpdateCheck() {
+  const banner     = document.getElementById('update-banner');
+  const bannerDesc = document.getElementById('update-banner-desc');
+  const btnUpdate  = document.getElementById('btn-do-update');
+  const btnDismiss = document.getElementById('btn-dismiss-update');
+
+  // Wire dismiss button
+  btnDismiss.addEventListener('click', () => {
+    banner.classList.remove('visible');
+    // Remember dismissal for this version so we don't re-show on every open
+    chrome.storage.local.get(['dismissedUpdateVersion'], (res) => {
+      // We'll store the version in the check below; just hide for now
+    });
+    banner.dataset.dismissed = 'true';
+  });
+
+  // Async check — runs in background so popup opens instantly
+  (async () => {
+    try {
+      const res = await bg({ action: 'CHECK_UPDATE' });
+      if (!res || !res.ok || !res.updateAvailable) return;
+
+      const { currentVersion, latestVersion, releaseUrl } = res;
+
+      // Check if user already dismissed this version
+      chrome.storage.local.get(['dismissedUpdateVersion'], (stored) => {
+        if (stored.dismissedUpdateVersion === latestVersion) return;
+
+        // Populate and show the banner
+        const descTpl = translations[currentLang]['update-desc'] || 'v{latest} is available — you have v{current}';
+        bannerDesc.textContent = descTpl
+          .replace('{latest}', latestVersion)
+          .replace('{current}', currentVersion);
+
+        btnUpdate.href = releaseUrl;
+        btnUpdate.textContent = translations[currentLang]['update-btn'] || 'Download';
+
+        // Re-wire dismiss to persist the version
+        btnDismiss.onclick = () => {
+          banner.classList.remove('visible');
+          chrome.storage.local.set({ dismissedUpdateVersion: latestVersion });
+        };
+
+        banner.classList.add('visible');
+      });
+    } catch (e) {
+      // Silently fail — update check is non-critical
+      console.warn('Update check failed:', e);
+    }
+  })();
 }
 
 // ─── Language Support (i18n) ──────────────────────────────────────────────
