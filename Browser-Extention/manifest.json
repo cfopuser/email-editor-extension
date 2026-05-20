@@ -1,0 +1,40 @@
+{
+  "manifest_version": 3,
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsw6k0L/F+9HVtNwtz+7fcZVPzuXGU3VdeaN8bJ5rQfUZZ0Dep+NkcoxrBWIcx/sGgR08508hAxymlVCEmy134ZZ/61+jUUr3E1zWZtoyFIi4HJ5jfVIKGPBW9DNlrRlkrsvPlysVRK0eEpPFzKSzxz9texLkLMTvcphcjFKL0r3kKsQ5il8hZa1xfGyfRU9IwvGXdiS/Ah8Jy9so4/vEh3QoJIFE7R+E3Tii6+kjboQ5LTz89g0h2FHzn3gf1N3lBpVAi1EMN5qNpNksGZFnFb4CHdHpaeMNO7EUSkk28uZgQ4gixo/UicImaOu0I8Drjd+HZtzBbphNGx5lRRgIHwIDAQAB",
+  "name": "Email Editor (עורך אימייל)",
+  "short_name": "Email Editor",
+  "description": "עריכה ומחיקת תוכן גם אחרי השליחה",
+  "version": "1.0.0",
+  "icons": {
+    "16":  "icons/envelope.png",
+    "32":  "icons/envelope.png",
+    "48":  "icons/envelope.png",
+    "128": "icons/envelope.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16":  "icons/envelope.png",
+      "32":  "icons/envelope.png",
+      "48":  "icons/envelope.png",
+      "128": "icons/envelope.png"
+    },
+    "default_title": "Email Editor"
+  },
+  "permissions": ["storage", "scripting", "tabs"],
+  "host_permissions": [
+    "https://mail.google.com/*",
+    "https://api.github.com/*"
+  ],
+  "background": { "service_worker": "background.js" },
+  "content_scripts": [{
+    "matches": ["https://mail.google.com/*"],
+    "js": ["content.js"],
+    "css": ["content.css"],
+    "run_at": "document_idle"
+  }],
+  "web_accessible_resources": [{
+    "resources": ["icons/*.png"],
+    "matches": ["https://mail.google.com/*"]
+  }]
+}

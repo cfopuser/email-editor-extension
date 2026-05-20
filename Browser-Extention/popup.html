@@ -1,0 +1,1345 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>עורך אימייל</title>
+  <!-- Google Fonts for premium Latin/Hebrew Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;500;600;700&family=Rubik:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <style>
+    /* ─── CSS Variables (Premium Dark & Light Aurora Themes) ──────── */
+    :root {
+      /* Dark Theme (Default) */
+      --bg-color: #080b11;
+      --bg-glow-1: rgba(13, 148, 136, 0.15);
+      /* Teal glow */
+      --bg-glow-2: rgba(124, 58, 237, 0.12);
+      /* Violet glow */
+      --surface-color: rgba(17, 24, 39, 0.65);
+      --surface-border: rgba(255, 255, 255, 0.08);
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --accent-teal: #10b981;
+      --accent-cyan: #06b6d4;
+      --accent-violet: #8b5cf6;
+      --accent-gradient: linear-gradient(135deg, #06b6d4, #10b981);
+      --danger-color: #f87171;
+      --danger-bg: rgba(248, 113, 113, 0.15);
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+      --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.6);
+      --radius-lg: 14px;
+      --radius-md: 10px;
+      --radius-sm: 6px;
+      --font-title: 'Rubik', sans-serif;
+      --font-body: 'Assistant', sans-serif;
+      --grid-color: rgba(255, 255, 255, 0.12);
+      --input-bg: rgba(15, 23, 42, 0.6);
+      --input-border: var(--surface-border);
+      --card-bg: var(--surface-color);
+      --panel-bg: rgba(15, 23, 42, 0.95);
+      --nav-bg: rgba(15, 23, 42, 0.7);
+      --title-color: #ffffff;
+    }
+
+    body.light-theme {
+      /* Light Theme */
+      --bg-color: #f8fafc;
+      --bg-glow-1: rgba(13, 148, 136, 0.08);
+      --bg-glow-2: rgba(124, 58, 237, 0.06);
+      --surface-color: rgba(255, 255, 255, 0.7);
+      --surface-border: rgba(0, 0, 0, 0.08);
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --accent-teal: #059669;
+      --accent-cyan: #0891b2;
+      --accent-violet: #7c3aed;
+      --accent-gradient: linear-gradient(135deg, #0891b2, #059669);
+      --danger-color: #ef4444;
+      --danger-bg: rgba(239, 68, 68, 0.1);
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.1);
+      --grid-color: rgba(0, 0, 0, 0.06);
+      --input-bg: rgba(255, 255, 255, 0.9);
+      --input-border: rgba(0, 0, 0, 0.12);
+      --card-bg: rgba(255, 255, 255, 0.85);
+      --panel-bg: rgba(255, 255, 255, 0.95);
+      --nav-bg: rgba(241, 245, 249, 0.85);
+      --title-color: #0f172a;
+    }
+
+    /* ─── Reset & Base ──────────────────────────────────────────────── */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    body {
+      width: 360px;
+      height: 420px;
+      background-color: var(--bg-color);
+      background-image:
+        radial-gradient(circle at 10% 20%, var(--bg-glow-1) 0%, transparent 45%),
+        radial-gradient(circle at 90% 80%, var(--bg-glow-2) 0%, transparent 45%);
+      background-attachment: fixed;
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      font-size: 13px;
+      -webkit-font-smoothing: antialiased;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Subtle grid pattern overlay */
+    body::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(var(--grid-color) 1px, transparent 1px);
+      background-size: 16px 16px;
+      opacity: 0.15;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ─── Header ────────────────────────────────────────────────────── */
+    .app-header {
+      height: 44px;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--surface-border);
+      background-color: rgba(8, 11, 17, 0.4);
+      backdrop-filter: blur(8px);
+      position: relative;
+      z-index: 1000;
+    }
+
+    body.light-theme .app-header {
+      background-color: rgba(248, 250, 252, 0.4);
+    }
+
+    .app-title-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .app-logo {
+      width: 20px;
+      height: 20px;
+      color: var(--accent-cyan);
+      filter: drop-shadow(0 0 4px rgba(6, 182, 212, 0.4));
+    }
+
+    .app-title {
+      font-family: var(--font-title);
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--title-color);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .theme-toggle-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-secondary);
+      padding: 6px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .theme-toggle-btn:hover {
+      color: var(--title-color);
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    body.light-theme .theme-toggle-btn:hover {
+      background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    .theme-toggle-btn svg {
+      width: 16px;
+      height: 16px;
+      stroke-width: 2.5px;
+    }
+
+    /* ─── Layout ────────────────────────────────────────────────────── */
+    .container {
+      padding: 12px 16px 16px 16px;
+      height: calc(100% - 44px);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      z-index: 1;
+    }
+
+    h1 {
+      font-family: var(--font-title);
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: var(--title-color);
+    }
+
+    h2 {
+      font-family: var(--font-title);
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--title-color);
+    }
+
+    p {
+      color: var(--text-secondary);
+      font-size: 12px;
+      line-height: 1.4;
+      margin-bottom: 8px;
+    }
+
+    /* ─── Inputs & Buttons ──────────────────────────────────────────── */
+    .input-group {
+      margin-bottom: 10px;
+      text-align: start;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 11px;
+      font-family: var(--font-title);
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: var(--accent-cyan);
+      text-shadow: 0 0 10px rgba(6, 182, 212, 0.1);
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--input-border);
+      background-color: var(--input-bg);
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 12px;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .input-group input:focus {
+      outline: none;
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.15), inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 8px 12px;
+      border-radius: var(--radius-md);
+      font-family: var(--font-title);
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      border: none;
+      gap: 6px;
+    }
+
+    .btn-primary {
+      background-color: var(--accent-cyan);
+      background-image: var(--accent-gradient);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(6, 182, 212, 0.2);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(6, 182, 212, 0.3);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .btn-secondary {
+      background-color: rgba(255, 255, 255, 0.05);
+      color: var(--text-primary);
+      border: 1px solid var(--surface-border);
+    }
+
+    body.light-theme .btn-secondary {
+      background-color: rgba(0, 0, 0, 0.04);
+    }
+
+    .btn-secondary:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    body.light-theme .btn-secondary:hover {
+      background-color: rgba(0, 0, 0, 0.08);
+    }
+
+    .btn-sm {
+      padding: 4px 8px;
+      font-size: 11px;
+      border-radius: var(--radius-sm);
+      width: auto;
+    }
+
+    .btn-danger {
+      color: var(--danger-color);
+      background-color: var(--danger-bg);
+      border: 1px solid rgba(248, 113, 113, 0.2);
+    }
+
+    .btn-danger:hover {
+      background-color: var(--danger-color);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(248, 113, 113, 0.3);
+    }
+
+    /* ─── Navigation Tabs ───────────────────────────────────────────── */
+    .nav {
+      display: flex;
+      margin: 8px 12px 4px 12px;
+      padding: 3px;
+      border-radius: var(--radius-md);
+      background-color: var(--nav-bg);
+      border: 1px solid var(--surface-border);
+      backdrop-filter: blur(8px);
+      height: 38px;
+      flex-shrink: 0;
+      gap: 4px;
+      position: relative;
+      z-index: 10;
+    }
+
+    .nav-item {
+      flex: 1;
+      text-align: center;
+      line-height: 30px;
+      font-size: 12px;
+      font-family: var(--font-title);
+      font-weight: 500;
+      color: var(--text-secondary);
+      cursor: pointer;
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      transition: border-color 0.2s, background-color 0.2s, color 0.2s, box-shadow 0.2s;
+    }
+
+    .nav-item:hover:not(.active) {
+      border-color: rgba(6, 182, 212, 0.35);
+      background-color: rgba(6, 182, 212, 0.06);
+      color: var(--text-primary);
+    }
+
+    body.light-theme .nav-item {
+      border-color: rgba(0, 0, 0, 0.1);
+    }
+
+    body.light-theme .nav-item:hover:not(.active) {
+      border-color: rgba(6, 182, 212, 0.4);
+      background-color: rgba(6, 182, 212, 0.06);
+    }
+
+    .nav-item.active {
+      color: #ffffff;
+      background-color: var(--accent-cyan);
+      background-image: var(--accent-gradient);
+      box-shadow: 0 4px 12px rgba(6, 182, 212, 0.25);
+      border-color: transparent;
+    }
+
+    /* ─── Screens ───────────────────────────────────────────────────── */
+    .screen {
+      display: none;
+      height: calc(100% - 44px);
+      width: 100%;
+    }
+
+    .screen.active {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ─── Setup Wizard Steps ───────────────────────────────────────── */
+    .wizard-wrapper {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .wizard-track {
+      display: flex;
+      width: 100%;
+      height: 100%;
+    }
+
+    .wizard-slide {
+      width: 100%;
+      height: 100%;
+      padding: 16px;
+      display: none;
+      flex-direction: column;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .wizard-slide.active {
+      display: flex;
+    }
+
+    .icon-ring {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(6, 182, 212, 0.1);
+      border: 1px solid rgba(6, 182, 212, 0.2);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-cyan);
+      box-shadow: 0 0 15px rgba(6, 182, 212, 0.1);
+      margin: 4px auto;
+    }
+
+    .icon-ring svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    /* Progress Checklist */
+    .progress-steps-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background: rgba(0, 0, 0, 0.2);
+      padding: 12px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--surface-border);
+      text-align: start;
+      margin-top: 10px;
+    }
+
+    body.light-theme .progress-steps-list {
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    .progress-step {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .progress-step.active {
+      color: var(--accent-cyan);
+      font-weight: 600;
+    }
+
+    .progress-step.completed {
+      color: var(--accent-teal);
+    }
+
+    .progress-step.failed {
+      color: var(--danger-color);
+    }
+
+    .step-icon {
+      font-size: 13px;
+      width: 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Spinner */
+    .spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid rgba(255, 255, 255, 0.05);
+      border-top-color: var(--accent-cyan);
+      border-right-color: var(--accent-teal);
+      border-radius: 50%;
+      animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      margin: 16px auto;
+      filter: drop-shadow(0 0 6px rgba(6, 182, 212, 0.2));
+    }
+
+    body.light-theme .spinner {
+      border: 3px solid rgba(0, 0, 0, 0.05);
+      border-top-color: var(--accent-cyan);
+      border-right-color: var(--accent-teal);
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .github-link {
+      display: block;
+      text-align: center;
+      font-size: 11px;
+      color: var(--accent-cyan);
+      text-decoration: none;
+      margin-top: 8px;
+    }
+
+    .github-link:hover {
+      text-decoration: underline;
+    }
+
+    /* Welcome Link Icon styles */
+    .welcome-link-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid var(--surface-border);
+      background: rgba(255, 255, 255, 0.02);
+      color: var(--text-secondary);
+      transition: all 0.2s ease;
+    }
+
+    body.light-theme .welcome-link-icon {
+      background: rgba(0, 0, 0, 0.02);
+    }
+
+    .welcome-link-icon:hover {
+      color: var(--accent-cyan);
+      background-color: rgba(6, 182, 212, 0.08);
+      border-color: rgba(6, 182, 212, 0.3);
+      transform: translateY(-2px);
+    }
+
+    /* ─── Icon Nav Tabs ─────────────────────────────────────────────── */
+    .nav-item-icon {
+      flex: 0 0 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+      cursor: pointer;
+      border-radius: var(--radius-sm);
+      color: var(--text-secondary);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      transition: background 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .nav-item-icon:hover:not(.active) {
+      border-color: rgba(6, 182, 212, 0.35);
+      background-color: rgba(6, 182, 212, 0.06);
+      color: var(--text-primary);
+    }
+
+    body.light-theme .nav-item-icon {
+      border-color: rgba(0, 0, 0, 0.1);
+    }
+
+    body.light-theme .nav-item-icon:hover:not(.active) {
+      border-color: rgba(6, 182, 212, 0.4);
+      background-color: rgba(6, 182, 212, 0.06);
+    }
+
+    .nav-item-icon svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .nav-item-icon.active {
+      color: #ffffff;
+      background-color: var(--accent-cyan);
+      background-image: var(--accent-gradient);
+      box-shadow: 0 4px 12px rgba(6, 182, 212, 0.25);
+      border-color: transparent;
+    }
+
+    /* ─── Info Tab ──────────────────────────────────────────────────── */
+    .info-tab-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px 14px;
+      gap: 12px;
+    }
+
+    .info-app-badge {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--surface-border);
+      width: 100%;
+    }
+
+    .info-app-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: var(--accent-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 16px rgba(6, 182, 212, 0.3);
+    }
+
+    .info-app-icon svg {
+      width: 24px;
+      height: 24px;
+      stroke: #fff;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .info-app-name {
+      font-family: var(--font-title);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .info-version-badge {
+      font-size: 10px;
+      color: var(--text-secondary);
+      background: rgba(6, 182, 212, 0.08);
+      border: 1px solid rgba(6, 182, 212, 0.2);
+      border-radius: 99px;
+      padding: 2px 10px;
+      font-family: var(--font-mono);
+    }
+
+    .info-links {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 100%;
+    }
+
+    .info-link-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--card-bg);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-lg);
+      padding: 12px 14px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .info-link-card:hover {
+      border-color: rgba(6, 182, 212, 0.4);
+      background: rgba(6, 182, 212, 0.04);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md), 0 0 12px rgba(6, 182, 212, 0.08);
+    }
+
+    .info-link-icon {
+      flex-shrink: 0;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: rgba(6, 182, 212, 0.1);
+      border: 1px solid rgba(6, 182, 212, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-cyan);
+    }
+
+    .info-link-icon svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .info-link-text {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .info-link-title {
+      font-family: var(--font-title);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 2px;
+    }
+
+    .info-link-desc {
+      font-size: 10px;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .info-link-arrow {
+      flex-shrink: 0;
+      color: var(--text-secondary);
+      transition: transform 0.2s, color 0.2s;
+    }
+
+    .info-link-card:hover .info-link-arrow {
+      color: var(--accent-cyan);
+      transform: translateX(3px);
+    }
+
+    html[dir="rtl"] .info-link-card:hover .info-link-arrow {
+      transform: translateX(-3px);
+    }
+
+    .info-link-arrow svg {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .step-icon-svg {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+      vertical-align: middle;
+      display: inline-block;
+    }
+
+    .spinner-mini {
+      animation: spin 1s linear infinite;
+    }
+
+    /* ─── Messages Tab & Scroll Control ────────────────────────────── */
+    .tab-content {
+      flex: 1;
+      overflow-y: auto;
+      height: calc(420px - 44px - 38px - 12px);
+      /* Fill popup minus header/nav/padding */
+    }
+
+    .msg-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 8px 12px;
+      padding-bottom: 76px;
+    }
+
+    @keyframes cardFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .msg-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-lg);
+      padding: 12px;
+      box-shadow: var(--shadow-sm);
+      backdrop-filter: blur(12px);
+      position: relative;
+      overflow: hidden;
+      animation: cardFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .msg-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 3px;
+      height: 100%;
+      background: var(--accent-gradient);
+    }
+
+    html[dir="ltr"] .msg-card::before {
+      right: auto;
+      left: 0;
+    }
+
+    .msg-card.deleted::before {
+      background: var(--danger-color);
+    }
+
+    .msg-card:hover {
+      transform: translateY(-1px);
+      border-color: rgba(6, 182, 212, 0.3);
+      box-shadow: var(--shadow-md), 0 0 10px rgba(6, 182, 212, 0.05);
+    }
+
+    .msg-card.deleted {
+      opacity: 0.55;
+    }
+
+    .msg-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .msg-recipient {
+      font-family: var(--font-title);
+      font-weight: 600;
+      font-size: 12px;
+      color: var(--accent-cyan);
+    }
+
+    .msg-date {
+      font-size: 10px;
+      color: var(--text-secondary);
+    }
+
+    .msg-subject {
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 2px;
+      color: var(--title-color);
+    }
+
+    .msg-preview {
+      font-size: 11px;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .msg-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .msg-actions .btn-sm svg {
+      width: 11px;
+      height: 11px;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 30px 16px;
+      color: var(--text-secondary);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .empty-icon {
+      font-size: 28px;
+      margin-bottom: 2px;
+      filter: drop-shadow(0 0 8px rgba(6, 182, 212, 0.15));
+    }
+
+    /* ─── Edit Panel ────────────────────────────────────────────────── */
+    #edit-panel {
+      display: none;
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      right: 12px;
+      background-color: var(--panel-bg);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-lg);
+      padding: 14px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      z-index: 100;
+      backdrop-filter: blur(20px);
+      animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(100%) scale(0.95);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+      }
+    }
+
+    #edit-panel label {
+      font-family: var(--font-title);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--accent-cyan);
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    #edit-panel textarea {
+      width: 100%;
+      height: 80px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--surface-border);
+      background-color: var(--input-bg);
+      color: var(--text-primary);
+      padding: 8px;
+      font-family: inherit;
+      font-size: 12px;
+      resize: none;
+      margin-bottom: 10px;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    #edit-panel textarea:focus {
+      outline: none;
+      border-color: var(--accent-cyan);
+    }
+
+    .edit-buttons {
+      display: flex;
+      gap: 8px;
+    }
+
+    /* ─── Toast ─────────────────────────────────────────────────────── */
+    .toast {
+      position: fixed;
+      top: -50px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: var(--panel-bg);
+      color: var(--text-primary);
+      padding: 8px 16px;
+      border-radius: 30px;
+      font-size: 12px;
+      font-weight: 500;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--surface-border);
+      backdrop-filter: blur(8px);
+      transition: top 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      z-index: 10000;
+    }
+
+    .toast.show {
+      top: 56px;
+    }
+
+    .toast.error {
+      border-color: var(--danger-color);
+      color: var(--danger-color);
+      background-color: var(--danger-bg);
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- ─── APP HEADER (Global) ─── -->
+  <div class="app-header">
+    <div class="app-title-group">
+      <svg class="app-logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+        <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+      </svg>
+      <span class="app-title" data-i18n="app-title">עורך אימייל</span>
+    </div>
+    <div class="header-actions">
+      <!-- Language Toggle Button -->
+      <button class="theme-toggle-btn" id="lang-toggle" title="Change Language / שנה שפה"
+        style="font-family: var(--font-title); font-weight: 700; font-size: 11px; padding: 4px 6px; min-width: 28px;">
+        EN
+      </button>
+      <!-- Theme Toggle Button -->
+      <button class="theme-toggle-btn" id="theme-toggle" title="החלף מצב תצוגה" data-i18n-title="theme-toggle-title">
+        <!-- Sun Icon (Default in Dark mode) -->
+        <svg class="theme-icon-sun" id="theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <!-- Moon Icon -->
+        <svg class="theme-icon-moon" id="theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2" style="display:none;">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- ─── WELCOME SCREEN ─── -->
+  <div id="screen-welcome" class="screen">
+    <div class="container" style="justify-content: space-between; height: 100%; padding: 16px;">
+      <div
+        style="text-align: center; display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 10px;">
+        <div class="icon-ring" style="width: 52px; height: 52px; margin-bottom: 2px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+            stroke-linejoin="round" style="width:24px;height:24px;">
+            <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+          </svg>
+        </div>
+        <h1 data-i18n="welcome-title">עורך אימייל</h1>
+        <p data-i18n="welcome-desc"
+          style="font-size: 12px; line-height: 1.5; color: var(--text-secondary); max-width: 280px; text-align: center;">
+          ערוך או מחק מיילים גם לאחר שליחתם.
+        </p>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 16px; align-items: center; width: 100%;">
+        <button class="btn btn-primary" id="btn-start-setup"
+          style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;">
+          <span data-i18n="welcome-btn-start">להתחלת ההגדרה</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" style="width:14px;height:14px;transform:scaleX(-1);">
+            <path
+              d="M4.5 16.5c-1.5 1.25-2.5 3.5-2.5 3.5s2.25-1 3.5-2.5L16.5 6.5c1.5-1.5 1.5-4 0-5.5s-4-1.5-5.5 0L4.5 16.5z">
+            </path>
+            <path d="M12 9l-4 4"></path>
+            <path d="M9 15l-3 3"></path>
+            <path d="M15 9l3-3"></path>
+          </svg>
+        </button>
+
+        <!-- Welcome Links (Bottom Icon Row) -->
+        <div style="display: flex; gap: 16px; justify-content: center; width: 100%;">
+          <a href="https://mitmachim.top/topic/96923" target="_blank" class="welcome-link-icon"
+            title="דיון בפורום מתמחים טופ" data-i18n-title="welcome-link-forum">
+            <img src="icons/mitmachim.ico" alt="Mitmachim"
+              style="width:18px;height:18px;object-fit:contain;border-radius:3px;" />
+          </a>
+          <a href="https://github.com/cfopuser/nachos-master" target="_blank" class="welcome-link-icon"
+            title="מאגר ה-GitHub של הפרויקט" data-i18n-title="welcome-link-github">
+            <svg viewBox="0 0 24 24" fill="currentColor" style="width:18px;height:18px;">
+              <path
+                d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── STARTUP WIZARD SCREEN ─── -->
+  <div id="screen-startup" class="screen">
+    <div class="wizard-wrapper">
+      <div class="wizard-track" id="wizard-track">
+
+        <!-- Slide 1: Enter PAT -->
+        <div class="wizard-slide active">
+          <div style="text-align: center;">
+            <div class="icon-ring">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path
+                  d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4">
+                </path>
+              </svg>
+            </div>
+            <h1 data-i18n="wizard-s1-title">אימות GitHub</h1>
+            <p style="margin-top: 4px;" data-i18n="wizard-s1-desc">הזן את ה-Personal Access Token (PAT) שלך מ-GitHub כדי
+              לאמת את החשבון.</p>
+            <div class="input-group" style="margin-top: 14px;">
+              <label data-i18n="wizard-s1-pat-label">GitHub Personal Access Token (PAT)</label>
+              <input type="password" id="input-pat" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"
+                data-i18n-placeholder="wizard-s1-pat-placeholder">
+            </div>
+          </div>
+          <div>
+            <button class="btn btn-primary" id="btn-next-step1" data-i18n="wizard-s1-btn">אמת והמשך</button>
+            <a href="https://github.com/settings/tokens/new?scopes=repo" target="_blank" class="github-link"
+              style="display: inline-flex; align-items: center; gap: 4px; justify-content: center; width: 100%;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" style="width:12px;height:12px;">
+                <path
+                  d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4">
+                </path>
+              </svg>
+              <span data-i18n="wizard-s1-help">יצירת Token חדש ב-GitHub (סמן את "repo")</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Slide 2: Configure Details -->
+        <div class="wizard-slide">
+          <div style="text-align: center; width: 100%;">
+            <div class="icon-ring">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" />
+                <path
+                  d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+              </svg>
+            </div>
+            
+            <!-- A. Setup Choice Screen -->
+            <div id="setup-choice-container" style="display: flex; flex-direction: column; width: 100%;">
+              <h1 data-i18n="wizard-s2-choice-title">בחירת סוג הגדרה</h1>
+              <p style="margin-top: 4px;" data-i18n="wizard-s2-choice-desc">בחר כיצד ברצונך להגדיר את המאגרים ב-GitHub.</p>
+              
+              <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 18px; width: 100%;">
+                <button class="btn btn-primary" id="btn-use-default-setup" style="padding: 10px;" data-i18n="wizard-s2-btn-default">הגדרות ברירת מחדל (מומלץ)</button>
+                <button class="btn btn-secondary" id="btn-show-custom-setup" style="padding: 10px;" data-i18n="wizard-s2-btn-custom">הגדרות מותאמות אישית</button>
+              </div>
+              <div style="margin-top: 12px;">
+                <button class="btn btn-secondary" id="btn-back-to-step1" style="width: 100%;" data-i18n="wizard-s2-btn-back">חזור</button>
+              </div>
+            </div>
+
+            <!-- B. Custom Setup Screen -->
+            <div id="setup-custom-container" style="display: none; flex-direction: column; width: 100%;">
+              <h1 data-i18n="wizard-s2-title">הגדרת מאגרים ושרת</h1>
+              <p style="margin-top: 4px;" data-i18n="wizard-s2-desc">באפשרותך להתאים אישית את שמות המאגרים ב-GitHub ואת כתובת השרת.</p>
+
+              <div style="margin-top: 6px; display: flex; flex-direction: column; gap: 4px; width: 100%;">
+                <div class="input-group">
+                  <label data-i18n="wizard-s2-pub-label">שם מאגר תמונות ציבורי</label>
+                  <input type="text" id="input-public-repo" placeholder="email-control-images" data-i18n-placeholder="wizard-s2-pub-placeholder">
+                </div>
+                <div class="input-group">
+                  <label data-i18n="wizard-s2-priv-label">שם מאגר אינדקס פרטי</label>
+                  <input type="text" id="input-private-repo" placeholder="email-control-index" data-i18n-placeholder="wizard-s2-priv-placeholder">
+                </div>
+                <div class="input-group">
+                  <label data-i18n="wizard-s2-cf-label">Cloudflare Worker URL</label>
+                  <input type="url" id="input-cf-url" placeholder="https://..." dir="ltr" data-i18n-placeholder="wizard-s2-cf-placeholder">
+                </div>
+              </div>
+              
+              <div style="display: flex; gap: 8px; margin-top: 10px; width: 100%;">
+                <button class="btn btn-secondary" id="btn-back-to-choice" style="flex: 1;" data-i18n="wizard-s2-btn-back">חזור</button>
+                <button class="btn btn-primary" id="btn-init-repos" style="flex: 2;" data-i18n="wizard-s2-btn-init">הגדר והפעל</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 3: Verification Loader / Steps -->
+        <div class="wizard-slide" style="justify-content: center;">
+          <div class="init-progress-card">
+            <div class="spinner" id="init-spinner" style="margin: 4px auto 14px auto;"></div>
+            <h2 id="verify-status-title"
+              style="font-family: var(--font-title); font-size: 15px; text-align: center; margin-bottom: 10px;"
+              data-i18n="wizard-s3-title">מאתחל את המערכת...</h2>
+
+            <div class="progress-steps-list">
+              <div class="progress-step" id="p-step-1">
+                <span class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round" class="step-icon-svg step-icon-pending">
+                    <circle cx="12" cy="12" r="10" stroke-dasharray="4 4"></circle>
+                  </svg></span>
+                <span class="step-text" data-i18n="wizard-s3-step1">חיבור ל-GitHub ואימות פרטים</span>
+              </div>
+              <div class="progress-step" id="p-step-2">
+                <span class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round" class="step-icon-svg step-icon-pending">
+                    <circle cx="12" cy="12" r="10" stroke-dasharray="4 4"></circle>
+                  </svg></span>
+                <span class="step-text" data-i18n="wizard-s3-step2">הגדרת מאגר תמונות ציבורי</span>
+              </div>
+              <div class="progress-step" id="p-step-3">
+                <span class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round" class="step-icon-svg step-icon-pending">
+                    <circle cx="12" cy="12" r="10" stroke-dasharray="4 4"></circle>
+                  </svg></span>
+                <span class="step-text" data-i18n="wizard-s3-step3">הגדרת מאגר אינדקס פרטי</span>
+              </div>
+              <div class="progress-step" id="p-step-4">
+                <span class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round" class="step-icon-svg step-icon-pending">
+                    <circle cx="12" cy="12" r="10" stroke-dasharray="4 4"></circle>
+                  </svg></span>
+                <span class="step-text" data-i18n="wizard-s3-step4">סנכרון ראשוני והפעלת התוסף</span>
+              </div>
+            </div>
+
+            <div id="init-error-container" style="display: none; margin-top: 14px;">
+              <p id="init-error-text"
+                style="color: var(--danger-color); font-size: 11px; margin-bottom: 10px; line-height: 1.3; text-align: center;">
+              </p>
+              <button class="btn btn-secondary btn-sm" id="btn-retry-init" style="width: 100%;"
+                data-i18n="wizard-s3-btn-retry">חזור ונסה שנית</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── MAIN SCREEN ─── -->
+  <div id="screen-main" class="screen">
+    <div class="nav">
+      <div class="nav-item active" data-target="tab-messages" data-i18n="nav-messages">ההודעות שלי</div>
+      <!-- Settings icon tab -->
+      <div class="nav-item-icon" data-target="tab-settings" title="הגדרות" data-i18n-title="nav-settings" id="nav-settings-btn">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+      </div>
+      <!-- Info icon tab -->
+      <div class="nav-item-icon" data-target="tab-info" title="מידע" data-i18n-title="nav-info" id="nav-info-btn">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+      </div>
+    </div>
+
+    <!-- Messages Tab -->
+    <div id="tab-messages" class="tab-content">
+      <div class="msg-list" id="msg-list">
+        <!-- Injected by JS -->
+      </div>
+    </div>
+
+    <!-- Settings Tab -->
+    <div id="tab-settings" class="tab-content" style="display:none;">
+      <div class="container" style="justify-content: flex-start; gap: 8px; padding: 12px; overflow-y: auto;">
+        <div class="input-group">
+          <label data-i18n="settings-pat-label">GitHub PAT</label>
+          <input type="password" id="edit-pat" placeholder="ghp_..." data-i18n-placeholder="settings-pat-placeholder">
+        </div>
+        <div class="input-group">
+          <label data-i18n="settings-pub-label">שם מאגר תמונות ציבורי</label>
+          <input type="text" id="edit-public-repo" placeholder="email-control-images"
+            data-i18n-placeholder="wizard-s2-pub-placeholder">
+        </div>
+        <div class="input-group">
+          <label data-i18n="settings-priv-label">שם מאגר אינדקס פרטי</label>
+          <input type="text" id="edit-private-repo" placeholder="email-control-index"
+            data-i18n-placeholder="wizard-s2-priv-placeholder">
+        </div>
+        <div class="input-group">
+          <label data-i18n="settings-cf-label">כתובת ה-Cloudflare Worker</label>
+          <input type="url" id="edit-cf" dir="ltr" placeholder="https://..."
+            data-i18n-placeholder="wizard-s2-cf-placeholder">
+        </div>
+        <div style="margin-top: 8px; width: 100%;">
+          <button class="btn btn-primary" id="btn-update-settings" data-i18n="settings-btn-update">עדכן הגדרות</button>
+          <div style="font-size: 11px; color: var(--text-secondary); text-align: center; margin-top: 10px;"
+            id="settings-info-label" data-i18n="settings-info-label">
+            מחובר כ- ...
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Info Tab -->
+    <div id="tab-info" class="tab-content" style="display:none;">
+      <div class="info-tab-inner">
+        <!-- App badge -->
+        <div class="info-app-badge">
+          <div class="info-app-icon">
+            <svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg>
+          </div>
+          <div class="info-app-name" data-i18n="info-app-name">עורך אימייל מאובטח</div>
+          <div class="info-version-badge" data-i18n="info-version">גרסה 1.0.0</div>
+        </div>
+
+        <!-- Links -->
+        <div class="info-links">
+          <!-- Forum link -->
+          <a href="https://mitmachim.top/topic/96923" target="_blank" class="info-link-card" id="info-link-forum">
+            <div class="info-link-icon">
+              <!-- Mitmachim forum logo -->
+              <img src="icons/mitmachim.ico" alt="Mitmachim" style="width:20px;height:20px;object-fit:contain;border-radius:3px;" />
+            </div>
+            <div class="info-link-text">
+              <div class="info-link-title" data-i18n="info-forum-title">פורום מתמחים טופ</div>
+              <div class="info-link-desc" data-i18n="info-forum-desc">דיונים, מדריכים ותמיכה טכנית בפרויקט</div>
+            </div>
+            <div class="info-link-arrow">
+              <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </div>
+          </a>
+
+          <!-- GitHub link -->
+          <a href="https://github.com/cfopuser/nachos-master" target="_blank" class="info-link-card" id="info-link-github">
+            <div class="info-link-icon">
+              <!-- GitHub octocat-style icon -->
+              <svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+            </div>
+            <div class="info-link-text">
+              <div class="info-link-title" data-i18n="info-github-title">פרויקט GitHub</div>
+              <div class="info-link-desc" data-i18n="info-github-desc">קוד המקור, דיווח על באגים והפצה</div>
+            </div>
+            <div class="info-link-arrow">
+              <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Panel -->
+    <div id="edit-panel">
+      <label data-i18n="edit-panel-title">עריכת תוכן (השינוי יתעדכן אצל הנמען)</label>
+      <textarea id="edit-textarea"></textarea>
+      <div class="edit-buttons">
+        <button class="btn btn-primary btn-sm" id="btn-save-edit" style="flex:1" data-i18n="edit-panel-save">שמור
+          שינויים</button>
+        <button class="btn btn-secondary btn-sm" id="btn-cancel-edit" style="flex:1"
+          data-i18n="edit-panel-cancel">ביטול</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+
+</html>
