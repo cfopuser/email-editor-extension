@@ -273,7 +273,6 @@ async function syncIndexBackground() {
   }
 }
 
-
 // ─── Message Listener ────────────────────────────────────────────────────────
 
 chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
@@ -517,7 +516,6 @@ chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
         await saveCachedMessages(filtered);
         
         sendResponse({ ok: true });
-
       } else {
         sendResponse({ ok: false, error: 'unknown action' });
       }
