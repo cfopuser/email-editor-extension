@@ -273,59 +273,6 @@ async function syncIndexBackground() {
   }
 }
 
-// ─── Update Checker ──────────────────────────────────────────────────────────
-
-// The public GitHub repo URL for this extension (used for update checks)
-const EXTENSION_GITHUB_OWNER = 'cfopuser';
-const EXTENSION_GITHUB_REPO  = 'email-editor-extension';
-
-/**
- * Compares two semver strings. Returns true if remoteVersion > localVersion.
- */
-function isNewerVersion(localVersion, remoteVersion) {
-  const parse = v => v.replace(/^v/, '').split('.').map(Number);
-  const local  = parse(localVersion);
-  const remote = parse(remoteVersion);
-  for (let i = 0; i < Math.max(local.length, remote.length); i++) {
-    const l = local[i]  || 0;
-    const r = remote[i] || 0;
-    if (r > l) return true;
-    if (r < l) return false;
-  }
-  return false;
-}
-
-async function checkForUpdate() {
-  const manifest = chrome.runtime.getManifest();
-  const currentVersion = manifest.version;
-
-  const url = `https://api.github.com/repos/${EXTENSION_GITHUB_OWNER}/${EXTENSION_GITHUB_REPO}/releases/latest`;
-  let response;
-  try {
-    response = await fetch(url, {
-      headers: { 'Accept': 'application/vnd.github+json' }
-    });
-  } catch (netErr) {
-    return { updateAvailable: false, currentVersion };
-  }
-
-  if (!response.ok) return { updateAvailable: false, currentVersion };
-
-  const data = await response.json();
-  const latestTag = (data.tag_name || '').trim();
-  if (!latestTag) return { updateAvailable: false, currentVersion };
-
-  const latestVersion = latestTag.replace(/^v/, '');
-  const updateAvailable = isNewerVersion(currentVersion, latestVersion);
-
-  return {
-    updateAvailable,
-    currentVersion,
-    latestVersion,
-    releaseUrl: data.html_url || `https://github.com/${EXTENSION_GITHUB_OWNER}/${EXTENSION_GITHUB_REPO}/releases/latest`,
-    releaseNotes: data.body || ''
-  };
-}
 
 // ─── Message Listener ────────────────────────────────────────────────────────
 
@@ -340,8 +287,7 @@ chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
     'EDIT_MESSAGE',
     'DELETE_MESSAGE',
     'LOAD_MESSAGES',
-    'PERMANENT_DELETE',
-    'CHECK_UPDATE'
+    'PERMANENT_DELETE'
   ];
 
   if (!msg || !handledActions.includes(msg.action)) {
@@ -571,10 +517,6 @@ chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
         await saveCachedMessages(filtered);
         
         sendResponse({ ok: true });
-
-      } else if (msg.action === 'CHECK_UPDATE') {
-        const updateInfo = await checkForUpdate();
-        sendResponse({ ok: true, ...updateInfo });
 
       } else {
         sendResponse({ ok: false, error: 'unknown action' });
